@@ -123,4 +123,8 @@ class SiteController extends Controller
     {
         return $this->render('about');
     }
+    
+   public function actionUsers($users = "chirag") { 
+         return $this->render("users",['users' => $users]); 
+      } 
 }
