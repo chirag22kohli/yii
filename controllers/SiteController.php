@@ -5,18 +5,15 @@ namespace app\controllers;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
-use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
 
-class SiteController extends Controller
-{
-    /**
-     * @inheritdoc
-     */
-    public function behaviors()
-    {
+//use app\models\User;
+
+class SiteController extends Controller {
+
+    public function behaviors() {
         return [
             'access' => [
                 'class' => AccessControl::className(),
@@ -38,11 +35,7 @@ class SiteController extends Controller
         ];
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function actions()
-    {
+    public function actions() {
         return [
             'error' => [
                 'class' => 'yii\web\ErrorAction',
@@ -54,73 +47,66 @@ class SiteController extends Controller
         ];
     }
 
-    /**
-     * Displays homepage.
-     *
-     * @return string
-     */
-    public function actionIndex()
-    {
+    public function actionIndex() {
         return $this->render('index');
     }
 
-    /**
-     * Login action.
-     *
-     * @return Response|string
-     */
-    public function actionLogin()
-    {
-        if (!Yii::$app->user->isGuest) {
+    public function actionLogin() {
+        if (!\Yii::$app->user->isGuest) {
             return $this->goHome();
         }
-
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
             return $this->goBack();
         }
         return $this->render('login', [
-            'model' => $model,
+                    'model' => $model,
         ]);
     }
 
-    /**
-     * Logout action.
-     *
-     * @return Response
-     */
-    public function actionLogout()
-    {
+    public function actionLogout() {
         Yii::$app->user->logout();
-
         return $this->goHome();
     }
 
-    /**
-     * Displays contact page.
-     *
-     * @return Response|string
-     */
-    public function actionContact()
-    {
+    public function actionContact() {
+        //load ContactForm model 
         $model = new ContactForm();
-        if ($model->load(Yii::$app->request->post()) && $model->contact(Yii::$app->params['adminEmail'])) {
-            Yii::$app->session->setFlash('contactFormSubmitted');
-
+//        $users = new User();
+        //if there was a POST request, then try to load POST data into a model 
+        if ($model->load(Yii::$app->request->post())) {
+            $contact = Yii::$app->request->post('ContactForm');
+            $model->load($contact['ConactForm']);
+//            die(print_r(Yii::$app->request->post()));
+            
+            $model->save();
+            echo $model->id;
+            die('d');
+            Yii::$app->session->setFlash('contactFormSubmitted ................');
             return $this->refresh();
         }
         return $this->render('contact', [
-            'model' => $model,
+                    'model' => $model,
         ]);
     }
 
-    /**
-     * Displays about page.
-     *
-     * @return string
-     */
-    public function actionAbout()
-    {
+    public function actionAbout() {
         return $this->render('about');
     }
+
+    public function actionSpeak($message = "default message") {
+        return $this->render("speak", ['message' => $message]);
+    }
+
+    public function actionShowContactModel() {
+        $mContactForm = new \app\models\ContactForm();
+        $mContactForm->name = "contactForm";
+        $mContactForm->email = "user@gmail.com";
+        $mContactForm->subject = "subject";
+        $mContactForm->body = "body";
+        var_dump($mContactForm);
+    }
+
 }
+
+?>
